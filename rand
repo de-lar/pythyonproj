@@ -1,0 +1,17 @@
+while room != 'Exit':
+    # Print what room you are in
+    # Prompts the user to enter a move (North, South, East West)
+    print('You are currently in ', room)
+    move = input('Enter a move')
+    # This will make sure if the move is a valid move
+    # If true then room will be updated to the new room based on move
+    if move in rooms[room]:
+        room = rooms[room][move]
+    # If user types Exit, it will break the loop and end game
+    elif move == 'Exit':
+        room = 'Exit'
+        print('you exited')
+    # If move is an invalid move, this will prompt the user to try again
+    else:
+        print('invalid move, try again')
+
