@@ -1,17 +1,75 @@
-while room != 'Exit':
-    # Print what room you are in
-    # Prompts the user to enter a move (North, South, East West)
-    print('You are currently in ', room)
-    move = input('Enter a move')
-    # This will make sure if the move is a valid move
-    # If true then room will be updated to the new room based on move
-    if move in rooms[room]:
-        room = rooms[room][move]
-    # If user types Exit, it will break the loop and end game
-    elif move == 'Exit':
-        room = 'Exit'
-        print('you exited')
-    # If move is an invalid move, this will prompt the user to try again
-    else:
-        print('invalid move, try again')
+import sys
 
+# Dictionary linking rooms to one another and linking items to their corresponding rooms
+rooms = {
+    'Captive Cell': {'south': 'Airlock Chamber', 'north': 'Weapon Room', 'east': 'Cafeteria', 'west': 'Engine Room'},
+    'Airlock Chamber': {'north': 'Captive Cell', 'west': 'Laboratory', 'item': 'Oxygen Tank'},
+    'Laboratory': {'east': 'Airlock Chamber', 'item': 'Medical Kit'},
+    'Cafeteria': {'west': 'Captive Cell', 'item': 'Energy Bar'},
+    'Weapon Room': {'south': 'Captive Cell', 'west': 'Control Room', 'item': 'Laser Beam Gun'},
+    'Control Room': {'east': 'Weapon Room', 'item': 'Night Goggles'},
+    'Engine Room': {'east': 'Captive Cell', 'south': 'Observation Deck', 'item': 'Shield'},
+    'Observation Deck': {'north': 'Engine Room', 'item': 'Space Pirate'}
+}
+
+# Starting room and inventory
+current_room = 'Captive Cell'
+inventory = []
+
+# Show instructions for the game
+def show_instructions():
+    print("Collect 6 items to win the game, or be eaten by the space pirate.")
+    print("Move commands: south, north, east, west")
+    print("Add to Inventory: get 'item name'")
+    print("-------------")
+
+# Show player's current status
+def show_status():
+    print("You are in the " + current_room)
+    print("Inventory: " + str(inventory))
+    if 'item' in rooms[current_room]:
+        print("You see a " + rooms[current_room]['item'])
+    print("-------------")
+
+# Main game loop
+def main():
+    show_instructions()
+    global current_room
+    global rooms
+    # Game loop continues until player wins or loses
+    while True:
+        show_status()
+
+        # Player input
+        move = input("Enter your move: ")
+
+        # Validate input
+        if move.lower() == 'quit':
+            sys.exit(0)
+        elif move.lower() in ['north', 'south', 'east', 'west']:
+            if move.lower() in rooms[current_room]:
+                current_room = rooms[current_room][move.lower()]
+            else:
+                print("You cannot move in that direction.")
+        elif move.lower().startswith('get'):
+            item_name = ' '.join(move.lower().split()[1:])
+            if 'item' in rooms[current_room] and item_name.lower() == rooms[current_room]['item'].lower():
+                print("You have picked up the " + item_name)
+                inventory.append(item_name.capitalize())
+                del rooms[current_room]['item']
+            else:
+                print("Item not found.")
+        else:
+            print("Invalid command.")
+
+        # Check if player wins or loses
+        if len(inventory) == 6 and current_room == 'Observation Deck':
+            print("Congratulations! You have collected all items and defeated the space pirate!")
+            sys.exit(0)
+        elif current_room == 'Observation Deck':
+            print("NOM NOM...GAME OVER!")
+            sys.exit(0)
+
+# Start the game
+if __name__ == '__main__':
+    main()
